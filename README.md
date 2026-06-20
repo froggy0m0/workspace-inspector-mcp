@@ -35,5 +35,6 @@ export WORKSPACE_INSPECTOR_ROOT="<workspace-root>"
 ## 테스트
 
 ```bash
-python3 tests/test_workspace_inspector_mcp.py
+python3 -m pip install -r requirements-dev.txt
+python3 -m pytest
 ```
