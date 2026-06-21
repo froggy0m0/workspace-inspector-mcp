@@ -9,11 +9,23 @@ GIT_TIMEOUT_SECONDS = 10
 
 def git_status(path: str) -> str:
     """검증된 workspace 디렉터리에서 git status 결과를 반환한다."""
+    resolved_path = _validate_git_repository(path)
+    return _git_status(resolved_path)
+
+
+def git_diff(path: str) -> str:
+    """검증된 workspace 디렉터리에서 git diff 결과를 반환한다."""
+    resolved_path = _validate_git_repository(path)
+    return _git_diff(resolved_path)
+
+
+def _validate_git_repository(path: str) -> Path:
+    """path가 조회 가능한 workspace 안 git repository인지 확인한다."""
     resolved_path = workspace_access.validate_access_path(path)
     workspace_access.validate_access_directory(resolved_path)
     _validate_git_work_tree(resolved_path)
     _validate_git_top_level(resolved_path)
-    return _git_status(resolved_path)
+    return resolved_path
 
 
 def _validate_git_work_tree(path: Path) -> None:
@@ -37,6 +49,11 @@ def _validate_git_top_level(path: Path) -> None:
 def _git_status(path: Path) -> str:
     """git status --short --branch 실행 결과를 반환한다."""
     return _run_git(["--no-optional-locks", "status", "--short", "--branch"], path).stdout
+
+
+def _git_diff(path: Path) -> str:
+    """git diff 실행 결과를 반환한다."""
+    return _run_git(["--no-optional-locks", "diff", "--no-ext-diff", "--no-textconv"], path).stdout
 
 
 def _run_git(args: list[str], cwd: Path, check: bool = True) -> subprocess.CompletedProcess[str]:

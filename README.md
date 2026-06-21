@@ -21,6 +21,7 @@
 | tool | 용도 |
 | --- | --- |
 | `gitStatus(path)` | git status 조회 |
+| `gitDiff(path)` | git diff 조회 |
 
 ## 차단 정책
 
@@ -45,6 +46,7 @@
 - Git work tree가 아니면 차단
 - Git repository root가 workspace root 밖이면 차단
 - `gitStatus`: `git status --short --branch` 결과 반환
+- `gitDiff`: `git diff` 결과 반환
 
 ## 환경변수
 

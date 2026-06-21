@@ -1,7 +1,7 @@
 from mcp.server.fastmcp import FastMCP
 
 from workspace_file_tools import find_files, list_dir, read_file, read_file_range, search_text
-from workspace_git_tools import git_status
+from workspace_git_tools import git_diff, git_status
 
 
 mcp = FastMCP("workspace-inspector")
@@ -65,6 +65,16 @@ def gitStatus(path: str) -> str:
     git status --short --branch 결과를 그대로 반환한다.
     """
     return git_status(path)
+
+
+@mcp.tool()
+def gitDiff(path: str) -> str:
+    """
+    설정된 workspace root 기준 상대경로의 Git repository 변경 diff를 조회한다.
+
+    git diff 결과를 그대로 반환한다.
+    """
+    return git_diff(path)
 
 
 if __name__ == "__main__":
