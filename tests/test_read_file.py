@@ -1,6 +1,8 @@
 import pytest
 
 import workspace_inspector_mcp as mcp_server
+import workspace_file_tools
+import workspace_access
 
 
 # 이 파일은 readFile(path) MCP tool의 동작만 검증한다.
@@ -49,7 +51,7 @@ def test_read_file_blocks_bad_path(write_text):
 
 def test_read_file_blocks_blocked_dirs(write_text):
     """BLOCKED_DIRS 아래 파일은 존재해도 읽지 않는다."""
-    for blocked_dir in sorted(mcp_server.BLOCKED_DIRS):
+    for blocked_dir in sorted(workspace_access.BLOCKED_DIRS):
         write_text(f"repo/{blocked_dir}/config.txt", "hidden\n")  # 차단 디렉터리별 파일 생성
 
         with pytest.raises(PermissionError):
@@ -72,7 +74,7 @@ def test_read_file_blocks_directory_path(workspace_root):
 
 def test_read_file_blocks_large_file(write_bytes):
     """MAX_READ_BYTES를 넘는 파일은 너무 큰 파일로 보고 차단한다."""
-    write_bytes("repo/large.txt", b"a" * (mcp_server.MAX_READ_BYTES + 1))
+    write_bytes("repo/large.txt", b"a" * (workspace_file_tools.MAX_READ_BYTES + 1))
 
     with pytest.raises(PermissionError):
         mcp_server.readFile("repo/large.txt")  # 파일 크기 제한 초과 차단

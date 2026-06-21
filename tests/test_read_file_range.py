@@ -1,6 +1,8 @@
 import pytest
 
 import workspace_inspector_mcp as mcp_server
+import workspace_file_tools
+import workspace_access
 
 
 # 이 파일은 readFileRange(path, startLine, endLine) MCP tool의 동작만 검증한다.
@@ -74,7 +76,7 @@ def test_read_file_range_blocks_bad_line_range(write_bytes):
         mcp_server.readFileRange("repo/App.java", 2, 1)  # 종료 줄은 시작 줄보다 작을 수 없다.
 
     with pytest.raises(ValueError):
-        mcp_server.readFileRange("repo/App.java", 1, mcp_server.MAX_RANGE_LINES + 1)  # 한 번에 읽는 줄 수 제한
+        mcp_server.readFileRange("repo/App.java", 1, workspace_file_tools.MAX_RANGE_LINES + 1)  # 한 번에 읽는 줄 수 제한
 
 
 def test_read_file_range_blocks_bad_path(write_bytes):
@@ -93,7 +95,7 @@ def test_read_file_range_blocks_bad_path(write_bytes):
 
 def test_read_file_range_blocks_blocked_dirs(write_text):
     """BLOCKED_DIRS 아래 파일은 존재해도 읽지 않는다."""
-    for blocked_dir in sorted(mcp_server.BLOCKED_DIRS):
+    for blocked_dir in sorted(workspace_access.BLOCKED_DIRS):
         write_text(f"repo/{blocked_dir}/config.txt", "hidden\n")  # 차단 디렉터리별 파일 생성
 
         with pytest.raises(PermissionError):

@@ -1,6 +1,8 @@
 import pytest
 
 import workspace_inspector_mcp as mcp_server
+import workspace_file_tools
+import workspace_access
 
 
 # 이 파일은 findFiles(path, pattern) MCP tool의 동작만 검증한다.
@@ -108,7 +110,7 @@ def test_find_files_blocks_bad_pattern(write_text):
 
 def test_find_files_skips_blocked_dirs(write_text):
     """BLOCKED_DIRS 아래 파일은 파일명이 매칭되어도 검색하지 않는다."""
-    for blocked_dir in sorted(mcp_server.BLOCKED_DIRS):
+    for blocked_dir in sorted(workspace_access.BLOCKED_DIRS):
         write_text(f"repo/{blocked_dir}/BoardHidden.java", "class BoardHidden {}\n")  # 차단 디렉터리별 매칭 파일 생성
 
     write_text("repo/src/App.java", "class App {}\n")
@@ -120,7 +122,7 @@ def test_find_files_skips_blocked_dirs(write_text):
 
 def test_find_files_blocks_blocked_dir_path(workspace_root):
     """차단 디렉터리 자체를 findFiles 시작 path로 지정해도 차단한다."""
-    for blocked_dir in sorted(mcp_server.BLOCKED_DIRS):
+    for blocked_dir in sorted(workspace_access.BLOCKED_DIRS):
         (workspace_root / f"repo/{blocked_dir}").mkdir(parents=True)  # 차단 디렉터리 생성
 
         with pytest.raises(PermissionError):
@@ -147,7 +149,7 @@ def test_find_files_skips_symlinks(workspace_root, write_text):
 
 def test_find_files_blocks_result_limit(write_text, monkeypatch):
     """검색 결과가 MAX_FIND_RESULTS를 넘으면 차단한다."""
-    monkeypatch.setattr(mcp_server, "MAX_FIND_RESULTS", 1)
+    monkeypatch.setattr(workspace_file_tools, "MAX_FIND_RESULTS", 1)
     write_text("repo/BoardOne.java", "class BoardOne {}\n")
     write_text("repo/BoardTwo.java", "class BoardTwo {}\n")
 
@@ -157,7 +159,7 @@ def test_find_files_blocks_result_limit(write_text, monkeypatch):
 
 def test_find_files_blocks_entry_limit(write_text, monkeypatch):
     """탐색한 entry 수가 MAX_FIND_ENTRIES를 넘으면 차단한다."""
-    monkeypatch.setattr(mcp_server, "MAX_FIND_ENTRIES", 2)
+    monkeypatch.setattr(workspace_file_tools, "MAX_FIND_ENTRIES", 2)
     write_text("repo/a.txt", "a\n")
     write_text("repo/b.txt", "b\n")
     write_text("repo/c.txt", "c\n")

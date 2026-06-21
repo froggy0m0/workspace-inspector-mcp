@@ -1,6 +1,7 @@
 import pytest
 
 import workspace_inspector_mcp as mcp_server
+import workspace_access
 
 
 # 이 파일은 listDir(path) MCP tool의 동작만 검증한다.
@@ -35,7 +36,7 @@ def test_list_dir_returns_empty_list(workspace_root):
 def test_list_dir_hides_blocked_dirs(workspace_root):
     """BLOCKED_DIRS는 목록에서 숨긴다."""
     (workspace_root / "repo").mkdir()
-    for blocked_dir in sorted(mcp_server.BLOCKED_DIRS):
+    for blocked_dir in sorted(workspace_access.BLOCKED_DIRS):
         (workspace_root / f"repo/{blocked_dir}").mkdir()  # 차단 디렉터리 생성
     (workspace_root / "repo/src").mkdir()
 
@@ -60,7 +61,7 @@ def test_list_dir_blocks_bad_path(workspace_root):
 
 def test_list_dir_blocks_blocked_dir_path(workspace_root):
     """차단 디렉터리 자체를 listDir 대상으로 지정해도 차단한다."""
-    for blocked_dir in sorted(mcp_server.BLOCKED_DIRS):
+    for blocked_dir in sorted(workspace_access.BLOCKED_DIRS):
         (workspace_root / f"repo/{blocked_dir}").mkdir(parents=True)  # 차단 디렉터리 생성
 
         with pytest.raises(PermissionError):

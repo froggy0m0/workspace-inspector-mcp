@@ -1,6 +1,8 @@
 import pytest
 
 import workspace_inspector_mcp as mcp_server
+import workspace_file_tools
+import workspace_access
 
 
 # 이 파일은 searchText(path, query) MCP tool의 동작만 검증한다.
@@ -90,7 +92,7 @@ def test_search_text_blocks_bad_query(write_text):
 
 def test_search_text_skips_blocked_dirs(write_text):
     """BLOCKED_DIRS 안의 파일은 내용이 매칭되어도 검색하지 않는다."""
-    for blocked_dir in sorted(mcp_server.BLOCKED_DIRS):
+    for blocked_dir in sorted(workspace_access.BLOCKED_DIRS):
         write_text(f"repo/{blocked_dir}/hidden.txt", "secret-value\n")  # 차단 디렉터리별 매칭 파일 생성
 
     write_text("repo/src/App.java", "public class App {}\n")
@@ -102,7 +104,7 @@ def test_search_text_skips_blocked_dirs(write_text):
 
 def test_search_text_blocks_blocked_dir_path(workspace_root):
     """차단 디렉터리 자체를 searchText 시작 path로 지정해도 차단한다."""
-    for blocked_dir in sorted(mcp_server.BLOCKED_DIRS):
+    for blocked_dir in sorted(workspace_access.BLOCKED_DIRS):
         (workspace_root / f"repo/{blocked_dir}").mkdir(parents=True)  # 차단 디렉터리 생성
 
         with pytest.raises(PermissionError):
@@ -152,7 +154,7 @@ def test_search_text_replaces_invalid_utf8(write_bytes):
 
 def test_search_text_result_limit(write_text):
     """검색 결과가 MAX_SEARCH_RESULTS를 넘으면 차단한다."""
-    lines = "\n".join("needle" for _ in range(mcp_server.MAX_SEARCH_RESULTS + 1))
+    lines = "\n".join("needle" for _ in range(workspace_file_tools.MAX_SEARCH_RESULTS + 1))
     write_text("repo/many.txt", lines)
 
     with pytest.raises(ValueError):

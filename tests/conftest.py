@@ -12,6 +12,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 os.environ["WORKSPACE_INSPECTOR_ROOT"] = str(PROJECT_ROOT)
 
 import workspace_inspector_mcp as mcp_server
+import workspace_access
 
 
 def _resolve_test_path(workspace_root: Path, path: str) -> Path:
@@ -28,8 +29,8 @@ def workspace_root(tmp_path, monkeypatch):
     root = tmp_path / "workspace"
     root.mkdir()
 
-    # MCP 서버가 참조하는 root만 임시 디렉터리로 바꿔 실제 파일을 건드리지 않는다.
-    monkeypatch.setattr(mcp_server, "WORKSPACE_ROOT", root.resolve())
+    # 검증 모듈이 참조하는 root만 임시 디렉터리로 바꿔 실제 파일을 건드리지 않는다.
+    monkeypatch.setattr(workspace_access, "WORKSPACE_ROOT", root.resolve())
     return root
 
 
