@@ -1,6 +1,7 @@
 from mcp.server.fastmcp import FastMCP
 
 from workspace_file_tools import find_files, list_dir, read_file, read_file_range, search_text
+from workspace_git_tools import git_status
 
 
 mcp = FastMCP("workspace-inspector")
@@ -54,6 +55,16 @@ def searchText(path: str, query: str) -> list[str]:
     파일 경로, 줄 번호, 해당 줄을 문자열로 반환한다.
     """
     return search_text(path, query)
+
+
+@mcp.tool()
+def gitStatus(path: str) -> str:
+    """
+    설정된 workspace root 기준 상대경로의 Git repository 상태를 조회한다.
+
+    git status --short --branch 결과를 그대로 반환한다.
+    """
+    return git_status(path)
 
 
 if __name__ == "__main__":

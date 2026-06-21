@@ -6,6 +6,8 @@
 
 ## 기능
 
+### 파일 조회
+
 | tool | 용도 |
 | --- | --- |
 | `readFile(path)` | 파일 전체 읽기 |
@@ -14,17 +16,35 @@
 | `findFiles(path, pattern)` | 파일명 검색 |
 | `searchText(path, query)` | 파일 내용 검색 |
 
+### Git 조회
+
+| tool | 용도 |
+| --- | --- |
+| `gitStatus(path)` | git status 조회 |
+
 ## 차단 정책
+
+### 공통
 
 - 절대경로 차단
 - Windows/UNC 경로 문자 차단: `\`, `:`
 - workspace root 밖 경로 차단
+
+### 파일 조회
+
 - `.git`, `.agents`, `.codex`, `.idea` 차단
 - symlink 탐색 차단
 - `readFile`: 1MB 초과, NUL byte 포함 파일 차단
 - `readFileRange`: 최대 300줄
 - `findFiles`: 결과 최대 500개, 탐색 최대 50,000개
 - `searchText`: 결과 최대 200줄
+
+### Git 조회
+
+- 디렉터리 path만 허용
+- Git work tree가 아니면 차단
+- Git repository root가 workspace root 밖이면 차단
+- `gitStatus`: `git status --short --branch` 결과 반환
 
 ## 환경변수
 
