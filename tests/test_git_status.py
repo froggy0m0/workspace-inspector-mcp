@@ -35,6 +35,7 @@ def test_git_status_success(workspace_root, monkeypatch):
             ["git", "rev-parse", "--is-inside-work-tree"],
             {
                 "cwd": repo.resolve(),
+                "stdin": workspace_git_tools.subprocess.DEVNULL,
                 "capture_output": True,
                 "text": True,
                 "shell": False,
@@ -45,6 +46,7 @@ def test_git_status_success(workspace_root, monkeypatch):
             ["git", "rev-parse", "--show-toplevel"],
             {
                 "cwd": repo.resolve(),
+                "stdin": workspace_git_tools.subprocess.DEVNULL,
                 "capture_output": True,
                 "text": True,
                 "shell": False,
@@ -55,6 +57,7 @@ def test_git_status_success(workspace_root, monkeypatch):
             ["git", "--no-optional-locks", "status", "--short", "--branch"],
             {
                 "cwd": repo.resolve(),
+                "stdin": workspace_git_tools.subprocess.DEVNULL,
                 "capture_output": True,
                 "text": True,
                 "shell": False,

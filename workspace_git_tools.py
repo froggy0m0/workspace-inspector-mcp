@@ -44,6 +44,7 @@ def _run_git(args: list[str], cwd: Path, check: bool = True) -> subprocess.Compl
     result = subprocess.run(
         ["git", *args],
         cwd=cwd,
+        stdin=subprocess.DEVNULL,
         capture_output=True,
         text=True,
         shell=False,
