@@ -67,6 +67,62 @@ def test_git_diff_success(workspace_root, monkeypatch):
     ]
 
 
+def test_git_diff_blocks_output_over_byte_limit(workspace_root, monkeypatch):
+    """git diff UTF-8 출력이 제한을 초과하면 자르지 않고 차단한다."""
+    repo = workspace_root / "repo"
+    repo.mkdir()
+    monkeypatch.setattr(workspace_git_tools, "GIT_DIFF_MAX_BYTES", 5)
+    calls = []
+
+    def fake_run(command, **kwargs):
+        calls.append(command)
+        if command == ["git", "rev-parse", "--is-inside-work-tree"]:
+            return SimpleNamespace(returncode=0, stdout="true\n", stderr="")
+        if command == ["git", "rev-parse", "--show-toplevel"]:
+            return SimpleNamespace(returncode=0, stdout=f"{repo.resolve()}\n", stderr="")
+        if command == ["git", "--no-optional-locks", "diff", "--no-ext-diff", "--no-textconv"]:
+            return SimpleNamespace(returncode=0, stdout="가가", stderr="")
+        raise AssertionError(command)
+
+    monkeypatch.setattr(workspace_git_tools.subprocess, "run", fake_run)
+
+    with pytest.raises(PermissionError, match="bytes"):
+        mcp_server.gitDiff("repo")
+
+    assert calls == [
+        ["git", "rev-parse", "--is-inside-work-tree"],
+        ["git", "rev-parse", "--show-toplevel"],
+        ["git", "--no-optional-locks", "diff", "--no-ext-diff", "--no-textconv"],
+    ]
+
+
+def test_git_diff_allows_output_at_byte_limit(workspace_root, monkeypatch):
+    """git diff UTF-8 출력이 정확히 제한 크기이면 허용한다."""
+    repo = workspace_root / "repo"
+    repo.mkdir()
+    monkeypatch.setattr(workspace_git_tools, "GIT_DIFF_MAX_BYTES", 6)
+    calls = []
+
+    def fake_run(command, **kwargs):
+        calls.append(command)
+        if command == ["git", "rev-parse", "--is-inside-work-tree"]:
+            return SimpleNamespace(returncode=0, stdout="true\n", stderr="")
+        if command == ["git", "rev-parse", "--show-toplevel"]:
+            return SimpleNamespace(returncode=0, stdout=f"{repo.resolve()}\n", stderr="")
+        if command == ["git", "--no-optional-locks", "diff", "--no-ext-diff", "--no-textconv"]:
+            return SimpleNamespace(returncode=0, stdout="가가", stderr="")
+        raise AssertionError(command)
+
+    monkeypatch.setattr(workspace_git_tools.subprocess, "run", fake_run)
+
+    assert mcp_server.gitDiff("repo") == "가가"
+    assert calls == [
+        ["git", "rev-parse", "--is-inside-work-tree"],
+        ["git", "rev-parse", "--show-toplevel"],
+        ["git", "--no-optional-locks", "diff", "--no-ext-diff", "--no-textconv"],
+    ]
+
+
 def test_git_diff_blocks_bad_path(write_text):
     """기존 workspace access 정책으로 잘못된 path를 차단한다."""
     write_text("repo/README.md", "hello\n")

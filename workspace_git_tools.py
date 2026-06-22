@@ -5,6 +5,7 @@ import workspace_access
 
 
 GIT_TIMEOUT_SECONDS = 10
+GIT_DIFF_MAX_BYTES = 500_000
 
 
 def git_status(path: str) -> str:
@@ -53,7 +54,15 @@ def _git_status(path: Path) -> str:
 
 def _git_diff(path: Path) -> str:
     """git diff 실행 결과를 반환한다."""
-    return _run_git(["--no-optional-locks", "diff", "--no-ext-diff", "--no-textconv"], path).stdout
+    output = _run_git(["--no-optional-locks", "diff", "--no-ext-diff", "--no-textconv"], path).stdout
+    _validate_git_diff_size(output)
+    return output
+
+
+def _validate_git_diff_size(output: str) -> None:
+    output_size = len(output.encode("utf-8"))
+    if output_size > GIT_DIFF_MAX_BYTES:
+        raise PermissionError(f"git diff output is too large: {output_size} bytes > {GIT_DIFF_MAX_BYTES} bytes")
 
 
 def _run_git(args: list[str], cwd: Path, check: bool = True) -> subprocess.CompletedProcess[str]:
