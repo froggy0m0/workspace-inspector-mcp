@@ -6,6 +6,8 @@ import workspace_access
 
 GIT_TIMEOUT_SECONDS = 10
 GIT_DIFF_MAX_BYTES = 500_000
+GIT_LOG_DEFAULT_LIMIT = 30
+GIT_LOG_MAX_LIMIT = 100
 
 
 def git_status(path: str) -> str:
@@ -18,6 +20,19 @@ def git_diff(path: str) -> str:
     """검증된 workspace 디렉터리에서 git diff 결과를 반환한다."""
     resolved_path = _validate_git_repository(path)
     return _git_diff(resolved_path)
+
+
+def git_log(path: str, limit: int = GIT_LOG_DEFAULT_LIMIT) -> str:
+    """검증된 workspace 디렉터리에서 git log 결과를 반환한다."""
+    _validate_git_log_limit(limit)
+    resolved_path = _validate_git_repository(path)
+    return _git_log(resolved_path, limit)
+
+
+def _validate_git_log_limit(limit: int) -> None:
+    """git log 조회 개수가 허용 범위인지 확인한다."""
+    if not 1 <= limit <= GIT_LOG_MAX_LIMIT:
+        raise ValueError("limit은 1 이상 100 이하이어야 합니다.")
 
 
 def _validate_git_repository(path: str) -> Path:
@@ -57,6 +72,11 @@ def _git_diff(path: Path) -> str:
     output = _run_git(["--no-optional-locks", "diff", "--no-ext-diff", "--no-textconv"], path).stdout
     _validate_git_diff_size(output)
     return output
+
+
+def _git_log(path: Path, limit: int) -> str:
+    """git log --oneline 실행 결과를 반환한다."""
+    return _run_git(["log", "--oneline", "-n", str(limit)], path).stdout
 
 
 def _validate_git_diff_size(output: str) -> None:

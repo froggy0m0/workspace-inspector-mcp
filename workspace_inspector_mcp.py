@@ -1,7 +1,7 @@
 from mcp.server.fastmcp import FastMCP
 
 from workspace_file_tools import find_files, list_dir, read_file, read_file_range, search_text
-from workspace_git_tools import git_diff, git_status
+from workspace_git_tools import git_diff, git_log, git_status
 
 
 mcp = FastMCP("workspace-inspector")
@@ -75,6 +75,17 @@ def gitDiff(path: str) -> str:
     git diff 결과를 그대로 반환한다.
     """
     return git_diff(path)
+
+
+@mcp.tool()
+def gitLog(path: str, limit: int = 30) -> str:
+    """
+    설정된 workspace root 기준 상대경로의 Git repository commit log를 조회한다.
+
+    limit 기본값은 30, 최대값은 100이다.
+    git log --oneline 결과를 그대로 반환하며 HEAD/origin/tag 힌트가 보이면 그대로 유지한다.
+    """
+    return git_log(path, limit)
 
 
 if __name__ == "__main__":
