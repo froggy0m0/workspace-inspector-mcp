@@ -93,6 +93,8 @@ def _run_git(args: list[str], cwd: Path, check: bool = True) -> subprocess.Compl
         stdin=subprocess.DEVNULL,
         capture_output=True,
         text=True,
+        encoding="utf-8",
+        errors="replace",
         shell=False,
         timeout=GIT_TIMEOUT_SECONDS,
     )
