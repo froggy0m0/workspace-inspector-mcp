@@ -1,7 +1,7 @@
 from mcp.server.fastmcp import FastMCP
 
 from workspace_file_tools import find_files, list_dir, read_file, read_file_range, search_text
-from workspace_git_tools import git_diff, git_log, git_status
+from workspace_git_tools import git_diff, git_log, git_show, git_status
 
 
 mcp = FastMCP("workspace-inspector")
@@ -86,6 +86,17 @@ def gitLog(path: str, limit: int = 30) -> str:
     git log --oneline 결과를 그대로 반환하며 HEAD/origin/tag 힌트가 보이면 그대로 유지한다.
     """
     return git_log(path, limit)
+
+
+@mcp.tool()
+def gitShow(path: str, revision: str) -> str:
+    """
+    설정된 workspace root 기준 상대경로의 Git repository commit 하나를 조회한다.
+
+    revision은 hash, branch, tag, HEAD, <revision>~N 형식만 허용한다.
+    git show 결과를 반환하며 range, file, reflog, search, pathspec 문법은 허용하지 않는다.
+    """
+    return git_show(path, revision)
 
 
 if __name__ == "__main__":

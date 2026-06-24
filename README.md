@@ -23,6 +23,7 @@
 | `gitStatus(path)` | git status 조회 |
 | `gitDiff(path)` | git diff 조회 |
 | `gitLog(path, limit=30)` | git log 조회 |
+| `gitShow(path, revision)` | commit 하나의 git show 조회 |
 
 ## 차단 정책
 
@@ -49,6 +50,8 @@
 - `gitStatus`: `git status --short --branch` 결과 반환
 - `gitDiff`: `git diff --no-ext-diff --no-textconv` 결과를 반환하며, UTF-8 출력이 500,000 bytes를 초과하면 차단
 - `gitLog`: `git log --oneline -n <limit>` 결과 반환, `limit`은 1 이상 100 이하
+- `gitShow`: hash, branch, tag, `HEAD`, `<revision>~N`만 허용하고, resolved commit의 `git show` 결과 반환
+- `gitShow`: range, file, reflog, search, pathspec 문법은 차단. 예: `HEAD^`, `main..HEAD`, `HEAD:README.md`, `HEAD@{1}`, `:/fix bug`, `HEAD -- README.md`
 
 ## 환경변수
 
